@@ -1,0 +1,50 @@
+plugins {
+    id "me.tatarka.retrolambda" version "3.2.3"
+}
+apply plugin: 'com.android.library'
+android {
+    compileSdkVersion 21
+    buildToolsVersion "21.1.2"
+
+    defaultConfig {
+        minSdkVersion 14
+        targetSdkVersion 21
+        versionCode 1
+        versionName "1.0"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    lintOptions {
+        abortOnError false
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    testCompile 'junit:junit:4.12'
+    compile 'com.android.support:appcompat-v7:21.0.3'
+    compile 'com.squareup.okhttp:okhttp:2.7.0'
+    compile 'com.alibaba:fastjson:1.2.7'
+    compile 'com.orhanobut:logger:1.11'
+    compile 'com.qiniu:qiniu-android-sdk:7.1.0'
+    testCompile 'org.mockito:mockito-core:2.0.34-beta'
+}
+
+task makeJar(type: Copy) {
+    delete 'build/libs/javaBaas_sdk.jar'
+    from('build/intermediates/bundles/release/')
+    into('build/libs/')
+    include('classes.jar')
+    rename ('classes.jar', 'JavaBaas_SDK.jar')
+}
+
+makeJar.dependsOn(build)
+//./gradlew makeJar
