@@ -14,24 +14,11 @@ import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.Toast;
 
-import com.alibaba.fastjson.JSON;
-import com.qiniu.android.http.ResponseInfo;
-import com.qiniu.android.storage.UpCompletionHandler;
-import com.qiniu.android.storage.UpProgressHandler;
-import com.qiniu.android.storage.UploadManager;
-import com.qiniu.android.storage.UploadOptions;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.File;
-import java.util.HashMap;
-import java.util.List;
-
-import com.javabaas.IUploader;
 import com.javabaas.JBCloud;
 import com.javabaas.JBFile;
+import com.javabaas.JBObject;
 import com.javabaas.JBQuery;
+import com.javabaas.ResponseEntity;
 import com.javabaas.callback.CloudCallback;
 import com.javabaas.callback.CountCallback;
 import com.javabaas.callback.DeleteCallback;
@@ -39,12 +26,11 @@ import com.javabaas.callback.FileUploadCallback;
 import com.javabaas.callback.FindCallback;
 import com.javabaas.callback.RequestCallback;
 import com.javabaas.callback.SaveCallback;
-import com.javabaas.JBObject;
-import com.javabaas.CustomResponse;
-import com.javabaas.ResponseEntity;
 import com.javabaas.exception.JBException;
-import com.javabaas.util.Utils;
 
+import java.io.File;
+import java.util.HashMap;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -62,64 +48,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
         amountEt = (EditText) findViewById(R.id.amount);
-        //initFile();
-    }
-
-    private void initFile(){
-        JBFile.setUploader(new IUploader() {
-            @Override
-            public void upload(CustomResponse entity, final JBFile jbFile, final FileUploadCallback callback) {
-                UploadManager uploadManager = new UploadManager();
-                String name = "", token = "";
-                try {
-                    JSONObject jsonObject = new JSONObject(entity.getData());
-                    JSONObject data = jsonObject.getJSONObject("data");
-                    name = data.getString("name");
-                    token = data.getString("token");
-                } catch (JSONException e) {
-                }
-                if (Utils.isBlankString(token) || Utils.isBlankString(name))
-                    return;
-
-                UpCompletionHandler completionHandler = new UpCompletionHandler() {
-                    @Override
-                    public void complete(String name, ResponseInfo responseInfo, JSONObject jsonObject) {
-                        //如果请求成功
-                        if (responseInfo.isOK()) {
-                            try {
-                                JSONObject data = jsonObject.getJSONObject("data");
-                                JSONObject file = data.getJSONObject("file");
-                                if (file != null)
-                                    jbFile.putAll(JSON.parseObject(file.toString() , JBObject.class));
-                                if (callback != null)
-                                    callback.done(jbFile);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-
-                        } else {
-                            if (callback != null)
-                                callback.error(null);
-                        }
-                    }
-                };
-                UpProgressHandler upProgressHandler = new UpProgressHandler(){
-
-                    @Override
-                    public void progress(String key, double percent) {
-                        if (callback != null)
-                            callback.onProgress(percent);
-                    }
-                };
-                if (jbFile.getData() != null)
-                    uploadManager.put(jbFile.getData(), name, token, completionHandler, new UploadOptions(null, null, false, upProgressHandler,
-                            null));
-                else if (jbFile.getFile() != null){
-                    uploadManager.put(jbFile.getFile(), name, token, completionHandler, new UploadOptions(null, null, false, upProgressHandler,
-                            null));
-                }
-            }
-        });
     }
 
     public void onSave(View view) {

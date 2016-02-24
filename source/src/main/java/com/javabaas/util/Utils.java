@@ -4,9 +4,6 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Base64;
-import android.util.SparseArray;
-import android.view.View;
-import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
@@ -15,7 +12,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -30,7 +26,6 @@ import java.util.Map;
 import java.util.Random;
 import java.util.TimeZone;
 import java.util.WeakHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 
 import com.javabaas.JBFile;
@@ -40,41 +35,10 @@ import com.javabaas.JBObject;
  * Created by xueshukai on 15/9/23 上午11:52.
  */
 public class Utils {
-    public static Toast toast = null;
-
-    public static void showToast(Context context, String msg) {
-        if (toast == null) {
-            toast = Toast.makeText(context, msg , Toast.LENGTH_SHORT);
-        } else {
-            toast.setText(msg);
-        }
-        toast.show();
-    }
-
-    public static class ViewHolder {
-        public static <T extends View> T get(View view, int id) {
-            SparseArray<View> viewHolder = (SparseArray<View>) view.getTag();
-            if (viewHolder == null) {
-                viewHolder = new SparseArray<>();
-                view.setTag(viewHolder);
-            }
-            View childView = viewHolder.get(id);
-            if (childView == null) {
-                childView = view.findViewById(id);
-                viewHolder.put(id, childView);
-            }
-            return (T) childView;
-        }
-    }
-
     public static boolean isBlankString(String str) {
         return str == null || str.trim().equals("");
     }
 
-    private static final String dateFormat = "yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'";
-    public static final String classNameTag = "className";
-    public static final String typeTag = "__type";
-    public static final String objectIdTag = "objectId";
     private static Map<Class<?>, Field[]> fieldsMap = Collections.synchronizedMap(new WeakHashMap());
     static Pattern pattern = Pattern.compile("^[a-zA-Z_][a-zA-Z_0-9]*$");
     static Pattern emailPattern = Pattern.compile("^\\w+?@\\w+?[.]\\w+");
@@ -82,17 +46,13 @@ public class Utils {
     static Pattern verifyCodePattern = Pattern.compile("\\d{6}");
     private static final ThreadLocal<SimpleDateFormat> THREAD_LOCAL_DATE_FORMAT = new ThreadLocal();
     static Random random = new Random();
-    static AtomicInteger acu = new AtomicInteger(-65536);
-    public static final int TYPE_WIFI = 1;
-    public static final int TYPE_MOBILE = 2;
-    public static final int TYPE_NOT_CONNECTED = 0;
     public static boolean isEmptyList(List e) {
         return e == null || e.isEmpty();
     }
 
-    public static Field[] getAllFiels(Class<?> clazz) {
+    public static Field[] getAllFields(Class<?> clazz) {
         if(clazz != null && clazz != Object.class) {
-            Field[] theResult = (Field[])fieldsMap.get(clazz);
+            Field[] theResult = fieldsMap.get(clazz);
             if(theResult != null) {
                 return theResult;
             } else {
@@ -173,23 +133,6 @@ public class Utils {
         return result;
     }
 
-    /*public static Map<String, Object> createPointerArrayOpMap(String key, String op, Collection<AVObject> objects) {
-        HashMap map = new HashMap();
-        map.put("__op", op);
-        ArrayList list = new ArrayList();
-        Iterator result = objects.iterator();
-
-        while(result.hasNext()) {
-            AVObject obj = (AVObject)result.next();
-            list.add(mapFromPointerObject(obj));
-        }
-
-        map.put("objects", list);
-        HashMap result1 = new HashMap();
-        result1.put(key, map);
-        return result1;
-    }*/
-
     public static Map<String, Object> createStringObjectMap(String key, Object value) {
         HashMap map = new HashMap();
         map.put(key, value);
@@ -249,7 +192,7 @@ public class Utils {
             return new Date(Long.parseLong(content));
         } else {
             Date date = null;
-            SimpleDateFormat format = (SimpleDateFormat)THREAD_LOCAL_DATE_FORMAT.get();
+            SimpleDateFormat format = THREAD_LOCAL_DATE_FORMAT.get();
             if(format == null) {
                 format = new SimpleDateFormat("yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'");
                 format.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -259,7 +202,6 @@ public class Utils {
             try {
                 date = format.parse(content);
             } catch (Exception var4) {
-                //log.e(var4.toString());
             }
 
             return date;
@@ -278,34 +220,12 @@ public class Utils {
         result.put("__type", "Date");
         result.put("iso", stringFromDate(date));
         return date.getTime();
-        //return result;
     }
 
     public static Date dateFromMap(Map<String, Object> map) {
         String value = (String)map.get("iso");
         return dateFromString(value);
     }
-
-    /*public static Map<String, Object> mapFromGeoPoint(AVGeoPoint point) {
-        HashMap result = new HashMap();
-        result.put("__type", "GeoPoint");
-        result.put("latitude", Double.valueOf(point.getLatitude()));
-        result.put("longitude", Double.valueOf(point.getLongitude()));
-        return result;
-    }
-
-    public static AVGeoPoint geoPointFromMap(Map<String, Object> map) {
-        double la = ((Number)map.get("latitude")).doubleValue();
-        double lo = ((Number)map.get("longitude")).doubleValue();
-        AVGeoPoint point = new AVGeoPoint(la, lo);
-        return point;
-    }
-
-    public static AVObject objectFromRelationMap(Map<String, Object> map) {
-        String className = (String)map.get("className");
-        AVObject object = objectFromClassName(className);
-        return object;
-    }*/
 
     public static Map<String, Object> mapFromByteArray(byte[] data) {
         HashMap result = new HashMap();
@@ -320,70 +240,8 @@ public class Utils {
     }
 
 
-    /*public static String jsonStringFromMapWithNull(Object map) {
-        return AVOSCloud.showInternalDebugLog()? JSON.toJSONString(map, new SerializerFeature[]{SerializerFeature.WriteMapNullValue, SerializerFeature.WriteNullBooleanAsFalse, SerializerFeature.WriteNullNumberAsZero, SerializerFeature.PrettyFormat}):JSON.toJSONString(map, new SerializerFeature[]{SerializerFeature.WriteMapNullValue, SerializerFeature.WriteNullBooleanAsFalse, SerializerFeature.WriteNullNumberAsZero});
-    }
-
-    public static String jsonStringFromObjectWithNull(Object map) {
-        return AVOSCloud.showInternalDebugLog()?JSON.toJSONString(map, new SerializerFeature[]{SerializerFeature.WriteMapNullValue, SerializerFeature.WriteNullBooleanAsFalse, SerializerFeature.WriteNullNumberAsZero, SerializerFeature.PrettyFormat}):JSON.toJSONString(map, new SerializerFeature[]{SerializerFeature.WriteMapNullValue, SerializerFeature.WriteNullBooleanAsFalse, SerializerFeature.WriteNullNumberAsZero});
-    }
-
-    public static Map<String, Object> mapFromFile(AVFile file) {
-        HashMap result = new HashMap();
-        result.put("__type", AVFile.className());
-        result.put("metaData", file.getMetaData());
-        switch(AVUtils.SyntheticClass_1.$SwitchMap$com$avos$avoscloud$AVOSCloud$StorageType[AVOSCloud.getStorageType().ordinal()]) {
-            case 1:
-                result.put("name", file.getName());
-                break;
-            case 2:
-            case 3:
-                result.put("id", file.getName());
-        }
-
-        return result;
-    }
-
-    public static AVFile fileFromMap(Map<String, Object> map) {
-        AVFile file = new AVFile("", "");
-        copyPropertiesFromMapToObject(map, file);
-        Object metadata = map.get("metaData");
-        if(metadata != null && metadata instanceof Map) {
-            file.getMetaData().putAll((Map)metadata);
-        }
-
-        if(isBlankString((String)file.getMetaData("_name"))) {
-            file.getMetaData().put("_name", file.getName());
-        }
-
-        switch(AVUtils.SyntheticClass_1.$SwitchMap$com$avos$avoscloud$AVOSCloud$StorageType[AVOSCloud.getStorageType().ordinal()]) {
-            case 2:
-            case 3:
-                file.setName((String)map.get("objectId"));
-            case 1:
-            default:
-                return file;
-        }
-    }
-
-    public static AVObject parseObjectFromMap(Map<String, Object> map) {
-        AVObject object = newAVObjectByClassName((String)map.get("className"));
-        object.setObjectId((String)map.get("objectId"));
-        copyPropertiesFromMapToAVObject(map, object);
-        return object;
-    }
-
-    public static String restfulServerData(Map<String, ?> data) {
-        if(data == null) {
-            return "{}";
-        } else {
-            Map map = getParsedMap(data);
-            return jsonStringFromMapWithNull(map);
-        }
-    }
-    */
     public static boolean hasProperty(Class<?> clazz, String property) {
-        Field[] fields = getAllFiels(clazz);
+        Field[] fields = getAllFields(clazz);
         Field[] arr$ = fields;
         int len$ = fields.length;
 
@@ -402,7 +260,7 @@ public class Utils {
             return false;
         } else {
             try {
-                Field[] exception = getAllFiels(clazz);
+                Field[] exception = getAllFields(clazz);
                 Field[] arr$ = exception;
                 int len$ = exception.length;
 
@@ -421,12 +279,8 @@ public class Utils {
         }
     }
 
-    /*public static String getEncodeUrl(String url, Map<String, String> params) {
-        return AsyncHttpClient.getUrlWithQueryString(true, url, new RequestParams(params));
-    }*/
-
     public static String getJSONValue(String msg, String key) {
-        Map jsonMap = (Map)JSON.parseObject(msg, HashMap.class);
+        Map jsonMap = JSON.parseObject(msg, HashMap.class);
         if(jsonMap != null && !jsonMap.isEmpty()) {
             Object action = jsonMap.get(key);
             return action != null?action.toString():null;
@@ -514,7 +368,7 @@ public class Utils {
         }
     }
 
-    public static String Base64Encode(String data) {
+    public static String base64Encode(String data) {
         return Base64.encodeToString(data.getBytes(), 10);
     }
 
@@ -533,24 +387,6 @@ public class Utils {
         HashMap dict = new HashMap();
         dict.put(cmp, value);
         return dict;
-    }
-
-    public static Map<String, Object> bean2Map(Object javaBean) {
-        Map<String, Object> ret = new LinkedHashMap<>();
-        try {
-            Method[] methods = javaBean.getClass().getDeclaredMethods();
-            for (Method method : methods) {
-                if (method.getName().startsWith("get")) {
-                    String field = method.getName();
-                    field = field.substring(field.indexOf("get") + 3);
-                    field = field.toLowerCase().charAt(0) + field.substring(1);
-                    Object value = method.invoke(javaBean, (Object[]) null);
-                    ret.put(field, (null == value ? "" : value));
-                }
-            }
-        } catch (Exception e) {
-        }
-        return ret;
     }
 
     public static String MD5(String s) {
@@ -573,7 +409,6 @@ public class Utils {
             }
             return new String(str).toLowerCase();
         } catch (Exception e) {
-            e.printStackTrace();
             return "";
         }
     }

@@ -14,6 +14,6 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
         Logger.init("JavaBaasLog").setMethodCount(0).hideThreadInfo();
-        JBCloud.init(this , "1f7049bfde7d440cb31210aa5e4d44ed" , "5645b2a574242e39eee89829" , "https://api.javabaas.com");
+        JBCloud.init(this , "1f7049bfde7d440cb31210aa5e4d44ed" , "5645b2a574242e39eee89829" , "https://api.javabaas.com" , null);
     }
 }

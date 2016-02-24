@@ -6,6 +6,8 @@ import android.text.TextUtils;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.javabaas.callback.GetInstallationIdCallback;
+import com.orhanobut.logger.LogLevel;
 import com.orhanobut.logger.Logger;
 import com.squareup.okhttp.Call;
 import com.squareup.okhttp.Callback;
@@ -28,6 +30,7 @@ import com.javabaas.util.SharedPreferencesUtils;
  */
 public class JBCloud {
     public static Context applicationContext;
+    private static String JAVA_BAAS_LOG = "JavaBaasLog";
 
     static Class<? extends IObjectManager> objectManagerClass = null;
 
@@ -41,14 +44,19 @@ public class JBCloud {
      * @param appId
      * @param host base url
      */
-    public static void init(Context context , String appKey , String appId , String host) {
+    public static void init(Context context , String appKey , String appId , String host , GetInstallationIdCallback callback) {
         applicationContext = context;
         IObjectManager.appKey = appKey;
         IObjectManager.appId = appId;
         IObjectManager.host = host;
         syncTimestamp();
-        getInstallation();
+        getInstallationId(callback);
         setObjectManager(ObjectManagerImp.class);
+        Logger.init(JAVA_BAAS_LOG).setMethodCount(0).hideThreadInfo().setLogLevel(LogLevel.NONE);
+    }
+
+    public static void showLog(){
+        Logger.init(JAVA_BAAS_LOG).setMethodCount(0).hideThreadInfo().setLogLevel(LogLevel.FULL);
     }
 
     public static void setObjectManager(Class<? extends IObjectManager> objectManager){
@@ -63,7 +71,6 @@ public class JBCloud {
             Constructor con = objectManagerClass.getConstructor(paramTypes);
             return ((IObjectManager) con.newInstance(applicationContext, tableName));
         } catch (Exception e) {
-            e.printStackTrace();
             throw new RuntimeException("IObjectManager illegal " , e);
         }
     }
@@ -107,10 +114,13 @@ public class JBCloud {
     }
 
     //获取InstallationID
-    public static void getInstallation() {
+    public static void getInstallationId(GetInstallationIdCallback callback) {
         String installationId = (String) SharedPreferencesUtils.get(applicationContext, "installationId" , "");
-        if (!TextUtils.isEmpty(installationId))
+        if (!TextUtils.isEmpty(installationId)){
+            if (callback != null)
+                callback.done(installationId);
             return;
+        }
         String url = "/api/installation";
         HashMap<String, Object> params = new HashMap<>();
         params.put("deviceToken" , getDeviceId());
@@ -122,6 +132,8 @@ public class JBCloud {
                 JSONObject data = response.getJSONObject("data");
                 String id = data.getString("id");
                 Logger.d("InstallationId 获取成功 "+id );
+                if (callback != null)
+                    callback.done(id);
                 if (id != null)
                     SharedPreferencesUtils.put(applicationContext, "installationId", id);
             }
@@ -129,6 +141,8 @@ public class JBCloud {
             @Override
             public void onError(JBException e) {
                 Logger.d("InstallationId 获取失败 "+ e.getMessage());
+                if (callback != null)
+                    callback.error(e);
             }
         },url, IObjectManager.Method.POST, JSON.toJSONString(params));
     }
@@ -142,12 +156,12 @@ public class JBCloud {
         call.enqueue(new Callback() {
             @Override
             public void onFailure(Request request, IOException e) {
-                Logger.d("时间戳失败 " , e.getMessage());
+                Logger.d("时间戳获取失败 " , e.getMessage());
             }
 
             @Override
             public void onResponse(Response response) throws IOException {
-                Logger.d("时间戳成功 " );
+                Logger.d("时间戳获取成功 " );
                 SharedPreferencesUtils.put(applicationContext, "timeDiff", Long.valueOf(response.body().string()) - System.currentTimeMillis());
             }
         });
