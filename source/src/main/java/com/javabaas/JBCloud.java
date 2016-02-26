@@ -75,7 +75,7 @@ public class JBCloud {
         }
     }
 
-    public static void callFunctionInBackground(String name, Map<String, Object> params, CloudCallback listener) {
+    public static void callFunctionInBackground(String name, Map<String, Object> params, final CloudCallback listener) {
         String url = "/api/cloud/" + name;
         StringBuilder stringBuffer = new StringBuilder(url);
         stringBuffer.append("?");
@@ -114,7 +114,7 @@ public class JBCloud {
     }
 
     //获取InstallationID
-    public static void getInstallationId(GetInstallationIdCallback callback) {
+    public static void getInstallationId(final GetInstallationIdCallback callback) {
         String installationId = (String) SharedPreferencesUtils.get(applicationContext, "installationId" , "");
         if (!TextUtils.isEmpty(installationId)){
             if (callback != null)

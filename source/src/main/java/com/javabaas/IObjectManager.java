@@ -1,7 +1,6 @@
 package com.javabaas;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -50,7 +49,7 @@ public abstract class IObjectManager {
      * @param id       对象id （更新对象时使用）
      * @param listener
      */
-    void saveObject(JBObject object, boolean isSync, String id, SaveCallback listener) {
+    void saveObject(final JBObject object, boolean isSync, String id, final SaveCallback listener) {
         String url;
         if (tableName.equals("_User")) {
             url = "/api/user";
@@ -61,20 +60,21 @@ public abstract class IObjectManager {
             url = url + "/" + id;
             method = Method.PUT;
         }
+        HashMap clone = (HashMap) object.clone();
         for (Map.Entry<String, Object> stringObjectEntry : object.entrySet()) {
             Object value = stringObjectEntry.getValue();
             if (value instanceof JBFile || (value instanceof Map && ((Map) value).get("__type") != null && ((Map) value).get("__type").equals("File"))) {
                 JBFile file = new JBFile();
                 file.putAll((Map) value);
-                object.put(stringObjectEntry.getKey(), Utils.mapFromFileObject(file));
+                clone.put(stringObjectEntry.getKey(), Utils.mapFromFileObject(file));
             } else if (value instanceof JBObject) {
-                object.put(stringObjectEntry.getKey(), Utils.mapFromPointerObject((JBObject) value));
+                clone.put(stringObjectEntry.getKey(), Utils.mapFromPointerObject((JBObject) value));
             } else if (value instanceof JBAcl) {
-                object.putAll(((JBAcl) value).getACLMap());
+                clone.putAll(((JBAcl) value).getACLMap());
             }
         }
         JSONObject jsonObject = new JSONObject(true);
-        jsonObject.putAll(object);
+        jsonObject.putAll(clone);
         String requestBody = jsonObject.toString();
 
         customJsonRequest(context, isSync, new ResponseListener<CustomResponse>() {
@@ -128,7 +128,7 @@ public abstract class IObjectManager {
      * @param isSync
      * @param deleteCallback
      */
-    void deleteByQuery(final Map<String, String> parameters, boolean isSync, DeleteCallback deleteCallback) {
+    void deleteByQuery(final Map<String, String> parameters, boolean isSync, final DeleteCallback deleteCallback) {
 
         customJsonRequest(context, isSync, new ResponseListener<CustomResponse>() {
             @Override
@@ -191,7 +191,7 @@ public abstract class IObjectManager {
      * @param parameters
      * @param callback
      */
-    void countQuery(final Map<String, String> parameters, boolean isSync, CountCallback callback) {
+    void countQuery(final Map<String, String> parameters, boolean isSync, final CountCallback callback) {
         customJsonRequest(context, isSync, new ResponseListener<CustomResponse>() {
             @Override
             public void onResponse(CustomResponse entity) {
@@ -218,7 +218,7 @@ public abstract class IObjectManager {
      * @param isSync
      * @param callback
      */
-    void incrementObjectKey(Map<String, Integer> incrementKeyAmount, String objectId, boolean isSync, RequestCallback callback) {
+    void incrementObjectKey(Map<String, Integer> incrementKeyAmount, String objectId, boolean isSync, final RequestCallback callback) {
         JSONObject jsonObject = new JSONObject(true);
         jsonObject.putAll(incrementKeyAmount);
         customJsonRequest(context, isSync, new ResponseListener<CustomResponse>() {
@@ -245,7 +245,7 @@ public abstract class IObjectManager {
      * @param isSync
      * @param callback
      */
-    void userLogin(Map<String, String> params, int type, String value, boolean isSync, LoginCallback callback) {
+    void userLogin(Map<String, String> params, int type, String value, boolean isSync, final LoginCallback callback) {
         String url = "/api/user/";
         int method = Method.GET;
         String requestBody = null;
@@ -290,7 +290,7 @@ public abstract class IObjectManager {
      * @param isSync
      * @param callback
      */
-    void bindWithSns(JBUser.JBThirdPartyUserAuth auth, String userId, boolean isSync, RequestCallback callback) {
+    void bindWithSns(JBUser.JBThirdPartyUserAuth auth, String userId, boolean isSync, final RequestCallback callback) {
         String url = "/api/user/" + userId + "/binding/" + auth.getSnsType();
         HashMap<String, String> params = new HashMap<>();
         params.put("accessToken", auth.accessToken);
@@ -328,7 +328,6 @@ public abstract class IObjectManager {
 
     public abstract void customJsonRequest(final Context context, boolean isSync, final ResponseListener<CustomResponse> listener, final String url, final int method, final String requestBody);
 
-    @NonNull
     protected static Map<String, String> createRequestHeader() {
         if (timeDiff == 0L)
             timeDiff = (long) SharedPreferencesUtils.get(JBCloud.applicationContext, "timeDiff", 0L);

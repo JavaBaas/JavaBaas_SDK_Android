@@ -1,3 +1,12 @@
+/.gradle
+/.idea
+/build
+/sample/build
+/sample/sample.iml
+/source/build
+/source/source.iml
+/local.properties
+/JavaBaas_SDK_Android.iml
 *.class
 
 # Mobile Tools for Java (J2ME)

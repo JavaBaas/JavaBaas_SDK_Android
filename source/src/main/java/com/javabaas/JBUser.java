@@ -46,6 +46,7 @@ public class JBUser extends JBObject {
                 JSONObject jsonObject = JSONObject.parseObject(user);
                 currentUser = new JBUser();
                 currentUser.putAll(jsonObject);
+                IObjectManager.parseJBObject(currentUser);
             }
         }
         return currentUser;
@@ -146,7 +147,7 @@ public class JBUser extends JBObject {
 
     }
 
-    public void signUpInBackground(SignUpCallback callback) {
+    public void signUpInBackground(final SignUpCallback callback) {
         saveInBackground(new SaveCallback() {
             @Override
             public void done(JBObject object) {
@@ -180,7 +181,7 @@ public class JBUser extends JBObject {
         HashMap<String, String> params = new HashMap<>();
         params.put("username", username);
         params.put("password", password);
-        Object[] objects = new Object[2];
+        final Object[] objects = new Object[2];
         JBCloud.getObjectManager(null).userLogin(params, IObjectManager.LOGIN_WITH_USERNAME_TYPE, null , true, new LoginCallback() {
             @Override
             public void done(JBUser jbUser) {
@@ -209,7 +210,7 @@ public class JBUser extends JBObject {
         HashMap<String, String> params = new HashMap<>();
         params.put("accessToken", auth.accessToken);
         params.put("uid", auth.getUserId());
-        Object[] objects = new Object[2];
+        final Object[] objects = new Object[2];
         JBCloud.getObjectManager(null).userLogin(params, IObjectManager.LOGIN_WITH_SNS_TYPE, auth.getSnsType(),true, new LoginCallback() {
             @Override
             public void done(JBUser jbUser) {
@@ -232,7 +233,7 @@ public class JBUser extends JBObject {
     }
 
     public static void bindWithSns(JBThirdPartyUserAuth auth , String userId) throws JBException {
-        Object[] objects = new Object[1];
+        final Object[] objects = new Object[1];
         JBCloud.getObjectManager(null).bindWithSns(auth, userId ,true, new RequestCallback() {
             @Override
             public void done() {
@@ -247,7 +248,7 @@ public class JBUser extends JBObject {
             throw (JBException) objects[0];
     }
 
-    public void saveInBackground(SaveCallback callback) {
+    public void saveInBackground(final SaveCallback callback) {
         JBCloud.getObjectManager(className).saveObject(this, false, getId(), new SaveCallback() {
             @Override
             public void done(JBObject object) {
@@ -268,7 +269,7 @@ public class JBUser extends JBObject {
         changeCurrentUser(null , true);
     }
 
-    public static void updatePassword(String oldPassword , String newPassword , RequestCallback callback){
+    public static void updatePassword(String oldPassword , String newPassword , final RequestCallback callback){
         if (JBUser.getCurrentUser() == null) {
             if (callback != null){
                 JBException exception = new JBException("用户未登录");

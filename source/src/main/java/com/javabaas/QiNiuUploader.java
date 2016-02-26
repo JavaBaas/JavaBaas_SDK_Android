@@ -19,7 +19,7 @@ import com.javabaas.util.Utils;
  */
 public class QiNiuUploader implements IUploader {
     @Override
-    public void upload(CustomResponse entity, JBFile jbFile, FileUploadCallback callback) {
+    public void upload(CustomResponse entity, final JBFile jbFile, final FileUploadCallback callback) {
         UploadManager uploadManager = new UploadManager();
         String name = "", token = "";
         try {

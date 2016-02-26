@@ -33,7 +33,7 @@ public class ObjectManagerImp extends IObjectManager {
     }
 
     @Override
-    public void customJsonRequest(Context context , boolean isSync, ResponseListener<CustomResponse> listener, String url, int method, String requestBody) {
+    public void customJsonRequest(Context context , boolean isSync, final ResponseListener<CustomResponse> listener, String url, int method, String requestBody) {
         if (Utils.isBlankString(host)){
             throw new RuntimeException("请在JBCloud.init()配置host url");
         }

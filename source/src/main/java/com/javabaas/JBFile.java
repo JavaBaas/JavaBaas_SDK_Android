@@ -44,7 +44,7 @@ public class JBFile extends JBObject {
         return className;
     }
 
-    public void saveInBackground(FileUploadCallback callback) {
+    public void saveInBackground(final FileUploadCallback callback) {
         getUploadToken(new ResponseListener<CustomResponse>() {
             @Override
             public void onResponse(CustomResponse entity) {

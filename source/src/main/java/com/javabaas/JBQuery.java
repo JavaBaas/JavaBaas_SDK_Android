@@ -396,7 +396,7 @@ public class JBQuery<T extends JBObject> {
 
     public void deleteAll() throws JBException{
         assembleParameters();
-        Object[] objects = new Object[1];
+        final Object[] objects = new Object[1];
         manager.deleteByQuery(getParameters(), true, new DeleteCallback() {
             @Override
             public void done() {
@@ -414,7 +414,7 @@ public class JBQuery<T extends JBObject> {
 
     public List<JBObject> find() throws JBException{
         assembleParameters();
-        Object[] objects = new Object[2];
+        final Object[] objects = new Object[2];
         manager.objectQuery(getParameters(), true, new FindCallback<JBObject>() {
             @Override
             public void done(List<JBObject> r) {
@@ -438,7 +438,7 @@ public class JBQuery<T extends JBObject> {
 
     public int count() throws JBException {
         assembleParameters();
-        Object[] objects = new Object[2];
+        final Object[] objects = new Object[2];
         manager.countQuery(getParameters(), true , new CountCallback() {
             @Override
             public void done(int count) {
