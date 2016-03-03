@@ -1,0 +1,46 @@
+apply plugin: 'com.android.library'
+android {
+    compileSdkVersion 21
+    buildToolsVersion "21.1.2"
+
+    defaultConfig {
+        minSdkVersion 14
+        targetSdkVersion 21
+        versionCode 1
+        versionName "1.0"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    lintOptions {
+        abortOnError false
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.squareup.okhttp:okhttp:2.7.0'
+    compile 'com.alibaba:fastjson:1.2.7'
+    compile 'com.qiniu:qiniu-android-sdk:7.1.0'
+}
+
+task sync_jars(dependsOn: build) {
+    //把所有依赖的.jar库都拷贝到build/outputs/libs下
+    copy {
+        into buildDir.getPath() + "/outputs/libs"
+        from configurations.compile.findAll {
+            it.getName().endsWith(".jar")
+        }
+    }
+}
+task makeJar(dependsOn: sync_jars ,type: Copy) {
+    from('build/intermediates/bundles/release/')
+    into('build/outputs/libs/')
+    include('classes.jar')
+    rename ('classes.jar', 'JavaBaas_SDK.jar')
+}
+
+
