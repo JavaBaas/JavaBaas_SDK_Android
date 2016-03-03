@@ -9,7 +9,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.javabaas.callback.ResponseListener;
 import com.javabaas.exception.JBException;
 import com.javabaas.util.Utils;
-import com.orhanobut.logger.Logger;
 import com.squareup.okhttp.Call;
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.MediaType;
@@ -37,7 +36,7 @@ public class ObjectManagerImp extends IObjectManager {
         if (Utils.isBlankString(host)){
             throw new RuntimeException("请在JBCloud.init()配置host url");
         }
-        Logger.d(url);
+        Utils.printLog(url);
         if (url.startsWith("/")) {
             url = host + url;
         }else{

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Base64;
+import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
@@ -410,6 +411,18 @@ public class Utils {
             return new String(str).toLowerCase();
         } catch (Exception e) {
             return "";
+        }
+    }
+
+    private static boolean isShowLog = false;
+    private static String JAVA_BAAS_LOG = "JavaBaasLog";
+    public static void showLog(){
+        isShowLog = true;
+    }
+
+    public static void printLog(String msg){
+        if (isShowLog){
+            Log.d(JAVA_BAAS_LOG , msg);
         }
     }
 

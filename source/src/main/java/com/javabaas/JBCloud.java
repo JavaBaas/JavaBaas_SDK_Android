@@ -7,8 +7,7 @@ import android.text.TextUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.javabaas.callback.GetInstallationIdCallback;
-import com.orhanobut.logger.LogLevel;
-import com.orhanobut.logger.Logger;
+import com.javabaas.util.Utils;
 import com.squareup.okhttp.Call;
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.Request;
@@ -30,7 +29,6 @@ import com.javabaas.util.SharedPreferencesUtils;
  */
 public class JBCloud {
     public static Context applicationContext;
-    private static String JAVA_BAAS_LOG = "JavaBaasLog";
 
     static Class<? extends IObjectManager> objectManagerClass = null;
 
@@ -52,11 +50,10 @@ public class JBCloud {
         syncTimestamp();
         getInstallationId(callback);
         setObjectManager(ObjectManagerImp.class);
-        Logger.init(JAVA_BAAS_LOG).setMethodCount(0).hideThreadInfo().setLogLevel(LogLevel.NONE);
     }
 
     public static void showLog(){
-        Logger.init(JAVA_BAAS_LOG).setMethodCount(0).hideThreadInfo().setLogLevel(LogLevel.FULL);
+        Utils.showLog();
     }
 
     public static void setObjectManager(Class<? extends IObjectManager> objectManager){
@@ -131,7 +128,7 @@ public class JBCloud {
                 JSONObject response = JSON.parseObject(entity.getData());
                 JSONObject data = response.getJSONObject("data");
                 String id = data.getString("id");
-                Logger.d("InstallationId 获取成功 "+id );
+                Utils.printLog("InstallationId 获取成功 "+id );
                 if (callback != null)
                     callback.done(id);
                 if (id != null)
@@ -140,7 +137,7 @@ public class JBCloud {
 
             @Override
             public void onError(JBException e) {
-                Logger.d("InstallationId 获取失败 "+ e.getMessage());
+                Utils.printLog("InstallationId 获取失败 "+ e.getMessage());
                 if (callback != null)
                     callback.error(e);
             }
@@ -156,12 +153,12 @@ public class JBCloud {
         call.enqueue(new Callback() {
             @Override
             public void onFailure(Request request, IOException e) {
-                Logger.d("时间戳获取失败 " , e.getMessage());
+                Utils.printLog("时间戳获取失败 " + e.getMessage());
             }
 
             @Override
             public void onResponse(Response response) throws IOException {
-                Logger.d("时间戳获取成功 " );
+                Utils.printLog("时间戳获取成功 " );
                 SharedPreferencesUtils.put(applicationContext, "timeDiff", Long.valueOf(response.body().string()) - System.currentTimeMillis());
             }
         });

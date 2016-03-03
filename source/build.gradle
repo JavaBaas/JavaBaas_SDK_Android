@@ -15,10 +15,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    /*compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }*/
     lintOptions {
         abortOnError false
     }
@@ -26,17 +22,15 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    testCompile 'junit:junit:4.12'
     compile 'com.squareup.okhttp:okhttp:2.7.0'
     compile 'com.alibaba:fastjson:1.2.7'
-    compile 'com.orhanobut:logger:1.11'
     compile 'com.qiniu:qiniu-android-sdk:7.1.0'
 }
 
 task sync_jars(dependsOn: build) {
-    //把所有依赖的.jar库都拷贝到build/aar/libs下
+    //把所有依赖的.jar库都拷贝到build/outputs/libs下
     copy {
-        into buildDir.getPath() + "/aar/libs"
+        into buildDir.getPath() + "/outputs/libs"
         from configurations.compile.findAll {
             it.getName().endsWith(".jar")
         }
@@ -44,8 +38,9 @@ task sync_jars(dependsOn: build) {
 }
 task makeJar(dependsOn: sync_jars ,type: Copy) {
     from('build/intermediates/bundles/release/')
-    into('build/aar/libs/')
+    into('build/outputs/libs/')
     include('classes.jar')
+    rename ('classes.jar', 'JavaBaas_SDK.jar')
 }
 
 

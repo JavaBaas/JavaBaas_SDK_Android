@@ -170,6 +170,7 @@ public abstract class IObjectManager {
                 List<JBObject> jbObjects = JSON.parseArray(entity.getData(), JBObject.class);
                 for (JBObject jbObject : jbObjects) {
                     parseJBObject(jbObject);
+                    jbObject.setClassName(tableName);
                 }
                 JBCacheManager.sharedInstance().save(url.toString(), entity.getData(), tableName);
                 if (findCallback != null)
