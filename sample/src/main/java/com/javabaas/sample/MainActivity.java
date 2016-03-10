@@ -1,7 +1,10 @@
 package com.javabaas.sample;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -205,25 +208,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
     public void onUpload(View view) {
-        JBFile jbFile = new JBFile(new File(Environment.getExternalStorageDirectory() , "share_pic.jpg"));
-        jbFile.saveInBackground(new FileUploadCallback() {
-            @Override
-            public void done(JBFile jbFile) {
-                System.out.println("上传成功   "+jbFile.getId());
-
-            }
-
-            @Override
-            public void error(JBException e) {
-                System.out.println("上传失败");
-
-            }
-
-            @Override
-            public void onProgress(double percent) {
-                System.out.println("上传  " + percent);
-            }
-        });
+        showFileChooser();
     }
 
 
@@ -348,5 +333,81 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 System.out.println(e.getResponseErrorCode());
             }
         });
+    }
+
+    private void showFileChooser() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("*/*");
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+
+        try {
+            startActivityForResult( Intent.createChooser(intent, "Select a File to Upload"), 100);
+        } catch (android.content.ActivityNotFoundException ex) {
+            Toast.makeText(this, "Please install a File Manager.",  Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)  {
+        switch (requestCode) {
+            case 100:
+                if (resultCode == RESULT_OK) {
+                    // Get the Uri of the selected file
+                    Uri uri = data.getData();
+                    String path = getPath(this, uri);
+                    if (TextUtils.isEmpty(path)){
+                        showToast(this , "文件错误");
+                        return;
+                    }
+                    final File file = new File(path);
+
+                    final ProgressDialog progressDialog = new ProgressDialog(this);
+                    progressDialog.show();
+                    progressDialog.setMax((int) file.length());
+                    new JBFile(file).saveInBackground(new FileUploadCallback() {
+                        @Override
+                        public void done(JBFile jbFile) {
+                            showToast(MainActivity.this , "上传成功 "+jbFile.getId());
+                            progressDialog.dismiss();
+                        }
+
+                        @Override
+                        public void error(JBException e) {
+                            showToast(MainActivity.this , "上传失败");
+                            progressDialog.dismiss();
+                        }
+
+                        @Override
+                        public void onProgress(double percent) {
+                            progressDialog.setProgress((int) (percent * file.length()));
+                        }
+                    });
+                }
+                break;
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private String getPath(Context context, Uri uri) {
+
+        if ("content".equalsIgnoreCase(uri.getScheme())) {
+            String[] projection = { "_data" };
+            Cursor cursor = null;
+
+            try {
+                cursor = context.getContentResolver().query(uri, projection,null, null, null);
+                int column_index = cursor.getColumnIndexOrThrow("_data");
+                if (cursor.moveToFirst()) {
+                    return cursor.getString(column_index);
+                }
+            } catch (Exception e) {
+                // Eat it
+            }
+        }
+
+        else if ("file".equalsIgnoreCase(uri.getScheme())) {
+            return uri.getPath();
+        }
+        return null;
     }
 }

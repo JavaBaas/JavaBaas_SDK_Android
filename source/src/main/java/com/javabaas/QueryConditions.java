@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +23,7 @@ public class QueryConditions {
     private boolean trace;
     private int skip;
     private String order;
-    private Map<String , Object> orderMap = new HashMap<>();
+    private Map<String , Object> orderMap = new LinkedHashMap<>();
     private Map<String, String> parameters = new HashMap<>();
 
     public QueryConditions() {

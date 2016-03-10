@@ -29,29 +29,36 @@
 
         <Button
             android:id="@+id/button"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
             android:onClick="onSave"
             android:text="保存对象" />
 
         <Button
+            android:layout_marginLeft="5dp"
             android:id="@+id/button2"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
             android:onClick="onDelete"
             android:text="删除对象" />
 
         <Button
-            android:layout_width="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
             android:onClick="onQuery"
             android:text="查询对象" />
 
         <Button
-            android:layout_width="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
             android:onClick="onCount"
-            android:text="查询Count" />
+            android:text="Count" />
     </LinearLayout>
 
     <Button
@@ -80,7 +87,7 @@
         <EditText
             android:id="@+id/amount"
             android:hint="自增量 默认为1"
-            android:layout_width="150dp"
+            android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:inputType="number" />
 

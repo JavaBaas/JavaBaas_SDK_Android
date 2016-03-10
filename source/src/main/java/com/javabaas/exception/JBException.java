@@ -34,6 +34,9 @@ public class JBException extends Exception {
      */
     public static int UPLOAD_ERROR = 6;
 
+    //responseErrorCode
+    public static int SESSION_TOKEN_ERROR_CODE = 1310;
+
     public int errorCode;
     public int responseErrorCode;
     public String responseErrorMsg;
