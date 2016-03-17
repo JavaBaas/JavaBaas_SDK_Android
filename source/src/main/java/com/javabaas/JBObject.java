@@ -60,8 +60,11 @@ public class JBObject extends LinkedHashMap<String, Object> {
             JBFile jbFile = new JBFile();
             jbFile.putAll(((JSONObject) o));
             return jbFile;
-        }else if (o instanceof JBFile)
-            return (JBFile) o;
+        }else if (o instanceof JBObject){
+            JBFile jbFile = new JBFile();
+            jbFile.putAll(((JBObject) o));
+            return jbFile;
+        }
         return null;
     }
 

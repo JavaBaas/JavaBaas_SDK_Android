@@ -83,6 +83,9 @@ public class ObjectManagerImp extends IObjectManager {
                     }else {
                         jbException = new JBException();
                     }
+                    if (jbException.responseErrorCode == JBException.SESSION_TOKEN_ERROR_CODE){//用户sessionToken失效
+                        JBUser.logout();
+                    }
                     jbException.errorCode = JBException.SERVER_ERROR;
                     //回调失败
                     if (listener != null)
@@ -127,6 +130,9 @@ public class ObjectManagerImp extends IObjectManager {
                                 jbException.responseErrorCode = jsonObject.getInteger("code");
                             }catch (Exception e){
                             }
+                        }
+                        if (jbException.responseErrorCode == JBException.SESSION_TOKEN_ERROR_CODE){//用户sessionToken失效
+                            JBUser.logout();
                         }
                         //回调失败
                         Message msg = handler.obtainMessage(1);
