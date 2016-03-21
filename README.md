@@ -1,6 +1,5 @@
 #目录
-##一、SDK介绍与快速入门
-##二、SDK安装与初始化
+##一、SDK安装与初始化
 ####SDK 手动安装：
 
 下载SDK并解压得到如下文件：
@@ -76,8 +75,8 @@ public void onSave(View view) {
 }
 ```
 
-##三、对象
-###3.1 JBObject
+##二、对象
+###2.1 JBObject
 `JBOject`是JavaBaas中的基础对象，也可以理解为`JBOject`对应着数据库表中的一条信息。
 
 假如你在云端数据库中使用`FoodLike`表来记录用户最喜欢的食物，那么表中至少会有`foodName`(食品名称)，`userName`(用户名称)属性，那么，你应该这样生成`JBOject`:
@@ -92,13 +91,13 @@ jbObject.put("userName","ZhangSan");
 * 每个`JBOject`都必须在云端有对应的数据库表和相应的字段。
 * 每个`JBOject`都有保留字段，分别为`_id``acl``createdPlat``updatedPlat``createdAt``updatedAt`，这些字段由系统自动生成和修改，不需要开发者进行指定。
 
-###3.2 同步与异步
+###2.2 同步与异步
   JavaBaas提供了数据检索，保存，更新，删除，查询的同步与异步的方法。  
   
   注: 在Android UI主线程中调用同步的方法，可能会导致UI主线程阻塞。所以，在UI主线程中请使用异步的方式。
   
 
-###3.3 检索对象
+###2.3 检索对象
  如果你知道了云端中某条数据的`objectId`，那么可以通过以下代码获取此条数据对应的`JBOject`对象:
 
 ```java
@@ -129,8 +128,8 @@ jbQuery.findInBackground(new FindCallback<JBObject>() {
 });
 ```
       
-###3.4 保存对象
-如3.1所示，假如你在本地生成一个`JBObject`之后，那么可以使用以下代码将其保存至云端:
+###2.4 保存对象
+如2.1所示，假如你在本地生成一个`JBObject`之后，那么可以使用以下代码将其保存至云端:
 
 ```java
 1.同步保存:
@@ -156,7 +155,7 @@ jbObject.saveInBackground(new SaveCallback() {
 ```
  
 
-###3.5 更新对象
+###2.5 更新对象
 如果你知道了云端中某条数据的`objectId`，那么可以通过以下代码更新云端对应的数据:
 
 ```java
@@ -187,7 +186,7 @@ jbObject.saveInBackground(new SaveCallback() {
 		}
 });
 ```
-###3.6 删除对象
+###2.6 删除对象
 如果你知道了云端中某条数据的`objectId`，那么可以通过以下代码删除云端对应的数据:
 
 ```java
@@ -213,7 +212,7 @@ JBObject.deleteByIdInBackground("FoodLike", objectId, new DeleteCallback() {
 });
 ```
 
-###3.7 关联对象
+###2.7 关联对象
 
 在数据存储中，类之间可能会有直接的关联关系。
 
@@ -243,7 +242,7 @@ citizenObject.saveInBackground(new SaveCallback() {
 });
 ```
 
-###3.8 原子操作 
+###2.8 原子操作 
 很多应用都会用到计数器的功能，比如在一个新闻类的应用中，我们需要记录每条新闻的查看次数，可以使用以下代码:
 
 ```
@@ -280,9 +279,9 @@ testObject.incrementKeyInBackground("openCount", new RequestCallback() {
 
 ```
 
-###3.9 批量操作 (敬请期待)
+###2.9 批量操作 (敬请期待)
 
-###3.10 数据类型 
+###2.10 数据类型 
 
 目前我们支持的数据类型有:
 
@@ -321,9 +320,9 @@ testObject.saveInBackground(new SaveCallback() {
 		}
 });
 ```
-##四、查询
+##三、查询
 SDK中提供了`JBQuery`类来满足应用不同条件下的查询需求。
-###4.1  基本查询
+###3.1  基本查询
 如果想查询指定表中的所有数据，可以使用以下代码:
 
 ```java
@@ -351,7 +350,7 @@ jbQuery.findInBackground(new FindCallback<JBObject>() {
 		}
 });
 ```
-###4.2  约束查询
+###3.2  约束查询
 SDK支持多种约束查询条件，举例如下:
 
 ```java
@@ -364,7 +363,7 @@ jbQuery.skip(2);
 //查询'age'字段为'18'的
 jbQuery.whereEqualTo("age",18);
 ```
-###4.3  数组值查询
+###3.3  数组值查询
 如果想查询数据库中某个字段包含在指定数组中的所有数据，可以添加以下限制条件:
 
 ```java
@@ -377,7 +376,7 @@ list.add(20);
 jbQuery.whereContainedIn("age", list);
 ```
 
-###4.4  模糊查询
+###3.4  模糊查询
 
 JavaBaas支持多种模糊查询条件，举例如下:
 
@@ -392,7 +391,7 @@ jbQuery.whereStartsWith("name","王");
 jbQuery.whereEndsWith("name","超");
 ```
 
-###4.5  关系查询
+###3.5  关系查询
 
 因为在数据存储中，类之间可能会有直接的关联关系。比如一个Student对象studentA，它的英语老师会指向一个Teacher的对象teacherA。
 
@@ -471,7 +470,7 @@ mainQuery.findInBackground(new FindCallback<JBObject>() {
 
 
 
-###4.6  缓存查询
+###3.6  缓存查询
 缓存查询是将查询的结果缓存到本地，当程序处于没有网络连接的状态时，就可以通过缓存查询查出上一次相同查询的结果。
 JavaBaas支持的缓存类型有:
 
@@ -502,7 +501,7 @@ jbQuery.findInBackground(new FindCallback<JBObject>() {
 });
 ```
 
-###4.7  计数查询
+###3.7  计数查询
 
 如果只是想知道数据库中指定条件的数据个数的话，可以使用计数查询，举例如下:
 
@@ -532,7 +531,7 @@ jbQuery.countInBackground(new CountCallback() {
 		}
 });
 ```
-##五、ACL权限控制
+##四、ACL权限控制
 
 JavaBaas提供了ACL(访问控制列表)来管理数据的访问权限。
 
@@ -562,8 +561,8 @@ dataObject.saveInBackground(new SaveCallback() {
 });
 ```
 
-##六、文件JBFile
-###6.1 JBFile
+##五、文件JBFile
+###5.1 JBFile
 JBFile允许你将文件存储到服务器中，常见的文件类型有:
 
  * 图片
@@ -572,9 +571,9 @@ JBFile允许你将文件存储到服务器中，常见的文件类型有:
  * 其它二进制数据
  
  
-###6.2 文件元数据
-###6.4 图像与缩略图获取（待定）
-###6.5 进度提示
+###5.2 文件元数据
+###5.4 图像与缩略图获取（待定）
+###5.5 进度提示
 在JBFile的上传回调中可以获得上传的进度
 
 例如，保存本地的一张图片到云端，并获取上传的进度，可以使用以下代码:
@@ -599,14 +598,14 @@ jbFile.saveInBackground(new FileUploadCallback() {
 });
 ```
 
-##七、用户JBUser
+##六、用户JBUser
 
-###7.1 JBUser
+###6.1 JBUser
 JavaBaas提供了JBUser类来处理用户相关的功能。
 
 需要注意的是，JBUser继承了JBObject，并在JBObject的基础上增加了一些对用户账户操作的功能。
 
-###7.2 特殊属性
+###6.2 特殊属性
 JBUser有几个特定的属性为:
 
 * username:用户的用户名(必须)
@@ -626,7 +625,7 @@ jbUser.setPassword("123456");
 jbUser.setPhone("110");
 ```
 
-###7.3 注册
+###6.3 注册
 用户注册的示例代码如下:
 
 ```
@@ -660,7 +659,7 @@ jbUser.signUpInBackground(new SignUpCallback() {
 });
 ```
 
-###7.4 登录
+###6.4 登录
 当用户注册成功后，用户可以通过注册的用户名，密码登录到他们的账户。
 用户登陆的示例代码如下:
 
@@ -696,7 +695,7 @@ JBUser.loginWithSnsInBackground(jbThirdPartyUserAuth, new LoginCallback() {
 });
 ```
 
-###7.5 当前用户
+###6.5 当前用户
 为了避免用户每次打开应用程序的时候都要登陆，可以使用本地缓存的`currentUser`对象
 
 当用户注册或者登陆成功后，本地会生成一个`currentUser`对象，你可以使用此对象来进行判断用户是否登陆:
@@ -725,7 +724,7 @@ JBUser.logout(new LogoutCallback() {
 ```
 
 
-###7.6 修改密码
+###6.6 修改密码
 假如用户登录成功后，想改变自己的用户信息，可以通过以下代码来更新:
 
 ```
@@ -744,7 +743,7 @@ if (jbUser!=null){
 	});
 }
 ```
-###7.7 SessionToken介绍
+###6.7 SessionToken介绍
 `SessionToken`是`JBUser`的一个非常特殊的属性，是
 `JBUser`的内建字段。当用户注册成功后，自动生成且唯一。
 
@@ -755,7 +754,7 @@ if (jbUser!=null){
 * 服务器用来校验用户登录与否
 * 保证在多设备登录同一账号情况下，用户账号安全
 
-##八、设备与推送
+##七、设备与推送
 
 `_Installation`是存在于云端的一个用来管理设备信息的默认表。
 
@@ -763,7 +762,7 @@ if (jbUser!=null){
 * `deviceType` :  对于Android设备来说，type就是"Android"
 
 
-##九、调用云方法
+##八、调用云方法
 
 有些逻辑是无法通过普通的增删改查数据来实现的，比如记录所有用户打开某界面的次数openCount。这时候，服务端通过提供"云端方法"即可解决这些问题。
 
