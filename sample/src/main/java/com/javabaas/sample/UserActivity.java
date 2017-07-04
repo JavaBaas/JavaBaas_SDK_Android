@@ -1,9 +1,9 @@
 package com.javabaas.sample;
 
+import android.app.Activity;
 import android.content.DialogInterface;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -11,14 +11,14 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.javabaas.JBObject;
+import com.javabaas.JBUser;
 import com.javabaas.callback.LoginCallback;
 import com.javabaas.callback.RequestCallback;
 import com.javabaas.callback.SaveCallback;
 import com.javabaas.callback.SignUpCallback;
-import com.javabaas.JBUser;
 import com.javabaas.exception.JBException;
 
-public class UserActivity extends AppCompatActivity {
+public class UserActivity extends Activity {
 
     private EditText nicknameEt;
     private EditText passwordEt;

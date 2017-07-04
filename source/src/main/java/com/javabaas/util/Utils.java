@@ -414,6 +414,13 @@ public class Utils {
         }
     }
 
+    public static boolean isEmpty(CharSequence str) {
+        if (str == null || str.length() == 0)
+            return true;
+        else
+            return false;
+    }
+
     private static boolean isShowLog = false;
     private static String JAVA_BAAS_LOG = "JavaBaasLog";
     public static void showLog(){

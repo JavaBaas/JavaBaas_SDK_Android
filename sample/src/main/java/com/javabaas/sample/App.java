@@ -2,6 +2,8 @@ package com.javabaas.sample;
 
 import android.app.Application;
 
+import com.javabaas.callback.GetInstallationIdCallback;
+import com.javabaas.exception.JBException;
 import com.orhanobut.logger.Logger;
 
 import com.javabaas.JBCloud;
@@ -14,6 +16,17 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
         Logger.init("JavaBaasLog").setMethodCount(0).hideThreadInfo();
-        JBCloud.init(this , "1f7049bfde7d440cb31210aa5e4d44ed" , "5645b2a574242e39eee89829" , "https://api.javabaas.com" , null);
+        JBCloud.showLog();
+        JBCloud.init(this, "a8c18441d7ab4dcd9ed78477015ab8b2", "594895b0b55198292ae266f1", "http://192.168.1.39:9000", new GetInstallationIdCallback() {
+            @Override
+            public void done(String id) {
+                System.out.println(id);
+            }
+
+            @Override
+            public void error(JBException e) {
+                System.out.println(e);
+            }
+        });
     }
 }

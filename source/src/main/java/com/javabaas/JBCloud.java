@@ -8,10 +8,6 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.javabaas.callback.GetInstallationIdCallback;
 import com.javabaas.util.Utils;
-import com.squareup.okhttp.Call;
-import com.squareup.okhttp.Callback;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -23,6 +19,11 @@ import com.javabaas.callback.CloudCallback;
 import com.javabaas.callback.ResponseListener;
 import com.javabaas.exception.JBException;
 import com.javabaas.util.SharedPreferencesUtils;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Request;
+import okhttp3.Response;
 
 /**
  * Created by xueshukai on 15/10/10 下午2:16.
@@ -127,7 +128,7 @@ public class JBCloud {
             public void onResponse(CustomResponse entity) {
                 JSONObject response = JSON.parseObject(entity.getData());
                 JSONObject data = response.getJSONObject("data");
-                String id = data.getString("id");
+                String id = data.getString("_id");
                 Utils.printLog("InstallationId 获取成功 "+id );
                 if (callback != null)
                     callback.done(id);
@@ -152,14 +153,15 @@ public class JBCloud {
         Call call = ObjectManagerImp.client.newCall(builder.build());
         call.enqueue(new Callback() {
             @Override
-            public void onFailure(Request request, IOException e) {
+            public void onFailure(Call call, IOException e) {
                 Utils.printLog("时间戳获取失败 " + e.getMessage());
             }
 
             @Override
-            public void onResponse(Response response) throws IOException {
+            public void onResponse(Call call, Response response) throws IOException {
                 Utils.printLog("时间戳获取成功 " );
                 SharedPreferencesUtils.put(applicationContext, "timeDiff", Long.valueOf(response.body().string()) - System.currentTimeMillis());
+
             }
         });
     }

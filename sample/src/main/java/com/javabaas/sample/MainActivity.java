@@ -1,5 +1,6 @@
 package com.javabaas.sample;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -9,7 +10,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.CompoundButton;
@@ -35,7 +35,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends Activity implements View.OnClickListener {
 
     boolean isSync = false;
     private EditText amountEt;
@@ -120,7 +120,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void onQuery(View view) {
-        final JBQuery jbQuery = JBQuery.getInstance("testC");
+        final JBQuery jbQuery = JBQuery.getInstance("Device");
+        jbQuery.whereEqualTo("_id" , "1231254");
+        jbQuery.include("user");
         if (isSync) {
             new Thread() {
                 @Override
