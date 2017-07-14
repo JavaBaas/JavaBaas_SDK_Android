@@ -137,10 +137,17 @@ public class ObjectManagerImp extends IObjectManager {
 
                 @Override
                 public void onResponse(Call call, Response response) throws IOException {
+
                     String data = response.body().string();
+                    Utils.printLog(data);
+
                     CustomResponse customResponse = new CustomResponse(data);
                     customResponse.setStatusCode(response.code());
+
+                    Utils.printLog(response.message());
+
                     if (response.code() == 200) {//成功
+                        Utils.printLog(response.message());
                         //回调成功
                         Message msg = handler.obtainMessage(0);
                         msg.obj = new Object[]{listener, customResponse};

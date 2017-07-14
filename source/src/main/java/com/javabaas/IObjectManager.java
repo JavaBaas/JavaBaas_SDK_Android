@@ -246,7 +246,7 @@ public abstract class IObjectManager {
      * @param isSync
      * @param callback
      */
-    void userLogin(Map<String, String> params, int type, String value, boolean isSync, final LoginCallback callback) {
+    void userLogin(Map<String, String> params, int type, int value, boolean isSync, final LoginCallback callback) {
         String url = "/api/user/";
         int method = Method.GET;
         String requestBody = null;
@@ -292,10 +292,17 @@ public abstract class IObjectManager {
      * @param callback
      */
     void bindWithSns(JBUser.JBThirdPartyUserAuth auth, String userId, boolean isSync, final RequestCallback callback) {
-        String url = "/api/user/" + userId + "/binding/" + auth.getSnsType();
+        int snsType = auth.getSnsType();
+        String url = "/api/user/" + userId + "/binding/" + snsType;
         HashMap<String, String> params = new HashMap<>();
         params.put("accessToken", auth.accessToken);
-        params.put("uid", auth.getUserId());
+        if(snsType == 3 || snsType == 1) {
+            params.put("openId", auth.getUserId());
+            params.put("unionId",auth.getUnionid());
+        } else if(snsType == 2){
+            params.put("uid", auth.getUserId());
+        }
+
         JSONObject jsonObject = new JSONObject();
         jsonObject.putAll(params);
         customJsonRequest(context, isSync, new ResponseListener<CustomResponse>() {

@@ -105,20 +105,30 @@ public class JBUser extends JBObject {
 
     public static class JBThirdPartyUserAuth implements Serializable {
         String accessToken;
-        String snsType;
+        int snsType;
         String userId;
-        public static final String SNS_TENCENT_WEIBO = "qq";
-        public static final String SNS_SINA_WEIBO = "weibo";
-        public static final String SNS_TENCENT_WEIXIN = "weixin";
+        String unionid;
+        public static final int SNS_TENCENT_WEIBO = 1;
+        public static final int SNS_SINA_WEIBO = 2;
+        public static final int SNS_TENCENT_WEIXIN = 3;
 
-        public JBThirdPartyUserAuth(String accessToken, String snstype, String userId) {
+        public JBThirdPartyUserAuth(String accessToken, int snsType, String userId,
+                                    String unionid) {
+            this.accessToken = accessToken;
+            this.snsType = snsType;
+            this.userId = userId;
+            this.unionid = unionid;
+        }
+
+        public JBThirdPartyUserAuth(String accessToken, int snstype, String userId) {
             this.accessToken = accessToken;
             this.snsType = snstype;
             this.userId = userId;
         }
 
-        protected static String platformUserIdTag(String type) {
-            return !"qq".equalsIgnoreCase(type) && !"weixin".equalsIgnoreCase(type) ? "uid" : "openid";
+        protected static String platformUserIdTag(int type) {
+            if(type == 1 || type == 3) return "openid" ;
+            else return "uid";
         }
 
         public String getAccessToken() {
@@ -133,15 +143,23 @@ public class JBUser extends JBObject {
             return this.userId;
         }
 
+        public String getUnionid() {
+            return unionid;
+        }
+
+        public void setUnionid(String unionid) {
+            this.unionid = unionid;
+        }
+
         public void setUserId(String userId) {
             this.userId = userId;
         }
 
-        public String getSnsType() {
+        public int getSnsType() {
             return this.snsType;
         }
 
-        public void setSnsType(String snsType) {
+        public void setSnsType(int snsType) {
             this.snsType = snsType;
         }
 
@@ -174,7 +192,7 @@ public class JBUser extends JBObject {
         HashMap<String, String> params = new HashMap<>();
         params.put("username", username);
         params.put("password", password);
-        JBCloud.getObjectManager(null).userLogin(params, IObjectManager.LOGIN_WITH_USERNAME_TYPE,null ,false, callback);
+        JBCloud.getObjectManager(null).userLogin(params, IObjectManager.LOGIN_WITH_USERNAME_TYPE,0 ,false, callback);
     }
 
     public static JBUser loginWithUsername(String username, String password) throws JBException {
@@ -182,13 +200,12 @@ public class JBUser extends JBObject {
         params.put("username", username);
         params.put("password", password);
         final Object[] objects = new Object[2];
-        JBCloud.getObjectManager(null).userLogin(params, IObjectManager.LOGIN_WITH_USERNAME_TYPE, null , true, new LoginCallback() {
+        JBCloud.getObjectManager(null).userLogin(params, IObjectManager.LOGIN_WITH_USERNAME_TYPE, 0 , true, new LoginCallback() {
             @Override
             public void done(JBUser jbUser) {
                 objects[0] = jbUser;
                 changeCurrentUser(jbUser, true);
             }
-
             @Override
             public void error(JBException e) {
                 objects[1] = e;
@@ -202,7 +219,13 @@ public class JBUser extends JBObject {
     public static void loginWithSnsInBackground(JBThirdPartyUserAuth auth, LoginCallback callback){
         HashMap<String, String> params = new HashMap<>();
         params.put("accessToken", auth.accessToken);
-        params.put("uid", auth.getUserId());
+        int snsType = auth.getSnsType();
+        if(snsType == 1 || snsType == 3){
+            params.put("openId", auth.getUserId());
+            params.put("unionId", auth.getUnionid());
+        } else {
+            params.put("uid", auth.getUserId());
+        }
         JBCloud.getObjectManager(null).userLogin(params, IObjectManager.LOGIN_WITH_SNS_TYPE,auth.getSnsType() ,false, callback);
     }
 
